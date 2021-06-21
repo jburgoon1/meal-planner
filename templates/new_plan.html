@@ -1,0 +1,49 @@
+{%extends 'base.html'%}
+{%block title%}New Plan{%endblock%}
+
+{%block content%}
+<form action="" id = "plan_form">
+        <label for="day">Day:
+        <input type="radio" id = "day" name="timeFrame" class = "plan_duration" value = "day">
+    </label>
+        <label for="week">Week:
+        <input type="radio" id="week" name="timeFrame" class = "plan_duration" value = "week">
+    </label>
+    <label for="calories">Calories:</label>
+    <input type="number" id = "calories" name="targetCalories">
+   
+        <label for="gluten_free">Gluten Free:</label>
+        <input type="radio" id = "gluten_free" name="diet" class = "diet" value = "gluten free">
+
+        <label for="keto">Ketogenic:</label>
+        <input type="radio" id = "keto" name="diet" class = "diet" value = "Ketogenic">
+        
+        <label for="vegitarian">Vegeatrian:</label>
+        <input type="radio" id = "vegetarian"  name="diet" class = "diet" value = "Vegeatrian">
+        
+        <label for="lacto_vegetarian">Lacto-Vegetarian:</label>
+        <input type="radio" id = "lacto_vegetarian" name="diet" class = "diet" value = "Lacto-Vegetarian">
+        
+        <label for="ovo_vegetarian">Ovo-Vegetarian:</label>
+        <input type="radio" id =  cc"ovo_vegetarian" name="diet" class = "diet" value = "Ovo-Vegetarian">
+        
+        <label for="veagn">Vegan:</label>
+        <input type="radio" id = "vegan" name="diet" class = "diet" value = "Vegan">
+        
+        <label for="pescitarian">Pescitarian:</label>
+        <input type="radio" id = "pescitarian" name="diet" class = "diet" value = "Pescitarian">
+        
+        <label for="paleo">Paleo:</label>
+        <input type="radio" id = "paleo" name="diet" class = "diet" value = "Paleo">
+        
+        <label for="primal">Primal:</label>
+        <input type="radio" id = "primal" name="diet" class = "diet" value = "Primal">
+        
+        <label for="whole30">Whole 30:</label>
+        <input type="radio" id = "whole30" name="diet" class = "diet" value = "Whole 30">
+    
+    <button>Get Your New Plan!</button>
+</form>
+<div id = "plan_info"></div>
+
+{%endblock%}
