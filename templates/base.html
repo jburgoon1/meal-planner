@@ -13,6 +13,7 @@
         href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
   <link rel="stylesheet" href="/static/stylesheets/style.css">
   <link rel="shortcut icon" href="/static/favicon.ico">
+  <link rel="stylesheet" href="app.css">
     <title>{%block title%}{%endblock%}</title>
 
 </head>
@@ -58,8 +59,11 @@
     {%block content%}
     
     {%endblock%}
+    
     <script src="https://unpkg.com/axios/dist/axios.js"></script>
 
     <script src="static/app.js"></script>
-</body>
+      {%block script%}
+      {%endblock%}
+  </body>
 </html>

@@ -2,6 +2,8 @@ import os
 
 from flask import Flask, render_template, request, flash, redirect, session, g, jsonify, json
 import requests
+import datetime
+from datetime import date, timedelta
 from keys import api_key, auth_token, account_sid
 from forms import signUpForm, loginForm
 from models import User, weekly_meal
@@ -9,7 +11,6 @@ from sqlalchemy.exc import IntegrityError
 from twilio.rest import Client
 
 
-# from forms import 
 from models import db, connect_db
 
 CURR_USER_KEY = "curr_user"
@@ -31,6 +32,42 @@ client = Client(account_sid, auth_token)
 connect_db(app)
 
 shopping_list = []
+request_list1 = []
+
+
+
+def next_weekday(d, weekday):
+    days_ahead = weekday - d.weekday()
+    if days_ahead <= 0: 
+        days_ahead += 7
+    return d + datetime.timedelta(days_ahead)
+
+d1 = date.today()
+d = datetime.datetime.now()
+next_monday = next_weekday(d, 0) 
+monday_stamp = datetime.datetime.timestamp(next_monday)
+next_tuesday = next_monday + timedelta(1)
+tuesday_stamp = datetime.datetime.timestamp(next_tuesday)
+next_wednesday = next_tuesday + timedelta(1)
+wednesday_stamp = datetime.datetime.timestamp(next_wednesday)
+next_thursday = next_wednesday + timedelta(1) 
+thursday_stamp = datetime.datetime.timestamp(next_thursday)
+next_friday = next_thursday + timedelta(1) 
+friday_stamp = datetime.datetime.timestamp(next_friday)
+next_saturday = next_friday + timedelta(1) 
+saturday_stamp = datetime.datetime.timestamp(next_saturday)
+next_sunday = next_saturday + timedelta(1)
+sunday_stamp = datetime.datetime.timestamp(next_sunday)
+monday = next_weekday(d1, 0)
+tuesday = monday + timedelta(1)
+wednesday = tuesday + timedelta(1)
+thursday = wednesday + timedelta(1)
+friday = thursday + timedelta(1)
+saturday = friday + timedelta(1)
+sunday = saturday + timedelta(1)
+print(monday)
+
+
 
 def send_message():
     message = client.messages \
@@ -79,10 +116,14 @@ def show_signup_form():
         email = form.email.data
         number = form.number.data
         payload = {"name":name, "username":username, "apiKey": api_key}
-        headers = {'COntent-Type': 'application/json', 'Accept': 'application/json'}
-        spoon_user = requests.post('https://api.spoonacular.com/users/connect', payload, headers = headers ).content.decode('UTF-8')
+
+        spoon_user = requests.post(f'https://api.spoonacular.com/users/connect?apiKey={api_key}', json = payload).content
+        spoon_user_json = json.loads(spoon_user)
+        print('**********')
         print(spoon_user)
-        user_data = User.signup(name = name, username = username, password = password, email = email, number = number, spoon_hash = spoon_user.hash, spoon_username = spoon_user.username)
+        print(spoon_user_json['username'], spoon_user_json['hash'])
+        print('***********')
+        user_data = User.signup(name = name, username = username, password = password, email = email, number = number, spoon_username = spoon_user_json['username'], spoon_hash = spoon_user_json['hash'])
         
         db.session.commit()
     
@@ -120,8 +161,9 @@ def show_new_plan():
 
 @app.route('/users/<int:id>/profile')
 def show_profile(id):
+    
     user= User.query.get_or_404(id)
-    return render_template('profile.html', user = user)
+    return render_template('profile.html',  user = user)
 
 @app.route('/api/newplan', methods= ['POST'])
 def get_plan():
@@ -131,18 +173,44 @@ def get_plan():
     diet = request.json.get('diet')
     payload = {'timeFrame': duration, 'targetCalories': calories, 'diet':diet, 'apiKey': api_key}
     plan = requests.get(f'https://api.spoonacular.com/mealplanner/generate', params=payload).content.decode('UTF-8')
-    weekly_plan = weekly_meal(meal = plan)
-    db.session.add(weekly_plan)
-    db.session.commit()
+  
+    json_plan = json.loads(plan)
+    
+    for day in json_plan['week'].items():
+        
+
+        for meal in day[1].items():
+            for meals in meal[1]:
+                print(meals)
+                for id in meals:  
+                    print(id)
+                    if day[0] == 'monday':
+                        request_list1.append({'date':monday_stamp, 'slot': 1, 'position': 0,'type': 'RECIPE', 'value': {'id': id , 'title':title, 'servings':servings}})
+                    if day[0] == 'tuesday':
+                        request_list1.append({'date':tuesday_stamp, 'slot': 1, 'position': 0, 'type': 'RECIPE', 'value': {'id':('id'), 'title':('title'), 'servings':('servings')}})
+                    if day[0] == 'wednesday':
+                        request_list1.append({'date':wednesday_stamp, 'slot': 1, 'position': 0, 'type': 'RECIPE', 'value': {'id':('id'), 'title':('title'), 'servings':('servings')}})
+                    if day[0] == 'thursday':
+                        request_list1.append({'date':thursday_stamp, 'slot': 1, 'position': 0, 'type': 'RECIPE', 'value': {'id':('id'), 'title':('title'), 'servings':('servings')}})
+                    if day[0] == 'friday':
+                        request_list1.append({'date':friday_stamp, 'slot': 1, 'position': 0, 'type': 'RECIPE', 'value': {'id':('id'), 'title':('title'), 'servings':('servings')}})
+                    if day[0] == 'saturday':
+                        request_list1.append({'date':saturday_stamp, 'slot': 1, 'position': 0, 'type': 'RECIPE', 'value': {'id':('id'), 'title':('title'), 'servings':('servings')}})
+                    if day[0] == 'sunday':
+                        request_list1.append({'date':sunday_stamp, 'slot': 1, 'position': 0, 'type': 'RECIPE', 'value': {'id':('id'), 'title':('title'), 'servings':('servings')}})
+  
+    request_list = [i for i in request_list1 if not (i['value'] == 'carbohydrates' or i['value'] =='fat' or i['value'] =='protein' or i['value'] =='calories')]
+    print(request_list1)
+    add_plan = requests.post(f'https://api.spoonacular.com/mealplanner/{g.user.spoon_username}/items?apiKey={api_key}&hash={g.user.spoon_hash}', json = request_list).content.decode('UTF-8')
+    
+    get_list()
     return jsonify({'duration':duration, 'targetCalories': calories, 'diet':diet, 'new_plan':plan})
 
 @app.route('/api/shopping', methods = ['POST'])
 def get_list():
-    meal = request.form.get('ingredientList')
-    servings = request.form.get('servings')
-    payload = {'ingredientList': meal, 'servings': servings, 'apiKey': api_key}
-    shopping_list.append(requests.get('https://api.spoonacular.com/recipes/parseIngredients', params = payload).content.decode('UTF-8'))
-    
+
+    resp = shopping_list.append(requests.post(f'https://api.spoonacular.com/mealplanner/{g.user.spoon_username}/shopping-list/{monday}/{sunday}?apiKey={api_key}&hash={g.user.spoon_hash}').content.decode('UTF-8'))
+    print(resp)
     return ({'list': shopping_list})
 
 

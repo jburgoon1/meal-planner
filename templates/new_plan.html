@@ -2,6 +2,7 @@
 {%block title%}New Plan{%endblock%}
 
 {%block content%}
+<div class="container">
 <form action="" id = "plan_form">
         <label for="day">Day:
         <input type="radio" id = "day" name="timeFrame" class = "plan_duration" value = "day">
@@ -43,7 +44,11 @@
         <input type="radio" id = "whole30" name="diet" class = "diet" value = "Whole 30">
     
     <button>Get Your New Plan!</button>
+</div>
 </form>
-<div id = "plan_info"></div>
+<div id = "plan_info">
+   
+</div>
+
 
 {%endblock%}

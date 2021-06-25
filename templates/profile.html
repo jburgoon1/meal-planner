@@ -3,8 +3,17 @@
 
 {%block content%}
 <h1>{{user.name}}</h1>
-{%for meal in user.meals%}
-<h2>{{meal}}</h2>
-{%endfor%}
 
+
+<div id = "plan">
+
+</div>
+
+
+
+{%endblock%}
+{%block script%}
+<script type="text/javascript">
+    $('#plan').html(localStorage.getItem("plan"))
+</script>
 {%endblock%}
