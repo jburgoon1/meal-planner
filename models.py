@@ -23,7 +23,7 @@ class User(db.Model):
     number = db.Column(db.String, nullable = False)
     spoon_username = db.Column(db.String)
     spoon_hash = db.Column(db.String)
-    meals = db.relationship('weekly_meal', backref = "user")
+    meal = db.relationship('weekly_meal', backref = "user")
 
     @classmethod
     def signup(cls, name, username, password, email, number, spoon_username, spoon_hash):
@@ -46,7 +46,7 @@ class User(db.Model):
         return False
 
 class weekly_meal(db.Model):
-    __tablename__ = "meals"
+    __tablename__ = "meal"
     id = db.Column(db.Integer, primary_key = True)
     meal = db.Column(db.PickleType)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete = "CASCADE"))
